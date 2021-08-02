@@ -4406,6 +4406,60 @@ components:
           type: string
           example: "1a3be38bcbb7911969283716ad7aa550250226b76a61fc51cc9a9a35d9276d81"
           description: Epoch number only used once
+        # cost_models:
+        #   type: string
+        #   example: ""
+        #   description: The per language cost models
+        price_mem:
+          nullable: true
+          type: number
+          example: 0.001
+          description: The per word cost of script memory usage
+        price_step:
+          nullable: true
+          type: number
+          example: 0.01
+          description: The cost of script execution step usage
+        max_tx_ex_mem:
+          nullable: true
+          type: string
+          example: "11000000000"
+          description: The maximum number of execution memory allowed to be used in a single transaction
+        max_tx_ex_steps:
+          nullable: true
+          type: string
+          example: "11000000000"
+          description: The maximum number of execution steps allowed to be used in a single transaction
+        max_block_ex_mem:
+          nullable: true
+          type: string
+          example: "110000000000"
+          description: The maximum number of execution memory allowed to be used in a single block
+        max_block_ex_steps:
+          nullable: true
+          type: string
+          example: "110000000000"
+          description: The maximum number of execution steps allowed to be used in a single block
+        max_val_size:
+          nullable: true
+          type: string
+          example: "5000"
+          description: The maximum Val size
+        collateral_percent:
+          nullable: true
+          type: number
+          example: 1.5
+          description: The percentage of the txfee which must be provided as collateral when including non-native scripts
+        max_collateral_inputs:
+          nullable: true
+          type: integer
+          example: 6
+          description: The maximum number of collateral inputs allowed in a transaction
+        coins_per_utxo_word:
+          nullable: true
+          type: string
+          example: "34482"
+          description: The cost per UTxO word
       required:
         - epoch
         - min_fee_a
@@ -4427,6 +4481,18 @@ components:
         - min_utxo
         - min_pool_cost
         - nonce
+        # - cost_models # Not yet implemented, weird dbsync format
+        - price_mem
+        - price_step
+        - max_tx_ex_mem
+        - max_tx_ex_steps
+        - max_block_ex_mem
+        - max_block_ex_steps
+        - max_val_size
+        - collateral_percent
+        - max_collateral_inputs
+        - coins_per_utxo_word
+
     tx_content:
       type: object
       properties:
@@ -4525,6 +4591,23 @@ components:
           type: integer
           example: 0
           description: Count of asset mints and burns within the transaction
+        valid_contract:
+          nullable: true
+          type: boolean
+          example: true
+          description: Contract validity
+        ex_unit_number:
+          nullable: true
+          type: integer
+          description: The cost of running the scripts in a transaction in arbitrary execution units
+        ex_unit_fee:
+          nullable: true
+          type: string
+          description: The fees associated with Plutus scripts in the transaction
+        script_size:
+          nullable: true
+          type: integer
+          description: The sum of the script sizes (in bytes) of scripts in the transaction
       required:
         - hash
         - block
@@ -4545,6 +4628,10 @@ components:
         - pool_update_count
         - pool_retire_count
         - asset_mint_or_burn_count
+        - valid_contract
+        - ex_unit_number
+        - ex_unit_fee
+        - script_size
     tx_content_utxo:
       type: object
       properties:
