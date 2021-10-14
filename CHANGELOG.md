@@ -5,14 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches maturity in v1.
 
-## [] - Unreleased
+## [0.1.30] - 2021-10-14
 
 ### Added
 
+- HTTP `425` - `Mempool Full` to `Errors` for better handling of full mempool in `/tx/submit` endpoint
+- Alonzo support related additions
+  - `valid_contract` property to `/txs/{hash}` endpoint, `true` when attached
+    script passed validation, `false` if it failed phase 2 validation
+  - `datum_hash` and `script_hash` properties to `/txs/{hash}/redeemers`
+  - `datum_hash` property to `/scripts/{hash}/redeemers`
+  - `/scripts/datum/{datum-hash}` endpoint
+  - `/scripts/{script_hash}/json` endpoint for dumping `timelock` scripts
+  - `/scripts/{script_hash}/cbor` endpoint for dumping `plutus` script contents
+
 ### Changed
+
+- `/epochs/{number}/parameters` - `collateral_percent` type from `number` to `integer`
 
 ### Fixed
 
+- `/network` supply descriptions
 
 ## [0.1.29] - 2021-10-07
 
@@ -21,6 +34,8 @@ and this project will adhere to [Semantic Versioning](https://semver.org/spec/v2
 - `/addresses/{address}/utxos/{asset}` endpoint
 
 ### Changed
+
+- enforce pagination limits
 
 ### Fixed
 
@@ -34,7 +49,7 @@ and this project will adhere to [Semantic Versioning](https://semver.org/spec/v2
 
 ### Changed
 
-- `/txs/{hash}/metadata/cbor` and `metadata/txs/labels/{label}/cbor` property `cbor_metadata` is now deprecated in favour of `cbor` property
+- `/txs/{hash}/metadata/cbor` and `metadata/txs/labels/{label}/cbor` property `cbor_metadata` is now deprecated in favour of `metadata` property
 
 ### Fixed
 
@@ -46,6 +61,7 @@ and this project will adhere to [Semantic Versioning](https://semver.org/spec/v2
 ### Added
 
 - Alonzo support related additions
+
   - `/scripts` endpoint for listing all scripts
   - `/scripts/{hash}` endpoint for script details
   - `/scripts/{hash}/redeemers` endpoint for listing reedemers of a script
