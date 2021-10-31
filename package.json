@@ -1,13 +1,13 @@
 {
   "name": "@blockfrost/openapi",
-  "version": "0.1.30",
+  "version": "0.1.32",
   "description": "OpenAPI specifications for blockfrost.io",
   "repository": "git@github.com:blockfrost/openapi.git",
   "author": "admin@blockfrost.io",
   "license": "MIT",
   "main": "./swagger.yaml",
   "scripts": {
-    "build": "redoc-cli bundle -o docs/index.html swagger.yaml"
+    "build": "redoc-cli bundle -t template.hbs -o docs/index.html swagger.yaml"
   },
   "devDependencies": {
     "ajv": "^6",
