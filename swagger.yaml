@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: "0.1.32"
+  version: "0.1.33"
   title: Blockfrost.io ~ API Documentation
   x-logo:
     url: https://staging.blockfrost.io/images/logo.svg
@@ -95,6 +95,8 @@ info:
       <tr><td>Haskell</td><td><a href="https://github.com/blockfrost/blockfrost-haskell">blockfrost-haskell</a></tr>
       <tr><td>Java</td><td><a href="https://github.com/blockfrost/blockfrost-java">blockfrost-java</a></tr>
       <tr><td>Python</td><td><a href="https://github.com/blockfrost/blockfrost-python">blockfrost-python</a></tr>
+      <tr><td>Rust</td><td><a href="https://github.com/blockfrost/blockfrost-rust">blockfrost-rust</a></tr>
+      <tr><td>Golang</td><td><a href="https://github.com/blockfrost/blockfrost-go">blockfrost-go</a></tr>
       <tr><td>Ruby</td><td><a href="https://github.com/blockfrost/blockfrost-ruby">blockfrost-ruby</a></tr>
       <tr><td>Swift</td><td><a href="https://github.com/blockfrost/blockfrost-swift">blockfrost-swift</a></tr>
       <tr><td>Kotlin</td><td><a href="https://github.com/blockfrost/blockfrost-kotlin">blockfrost-kotlin</a></tr>
@@ -2026,7 +2028,6 @@ paths:
       summary: Assets associated with the account addresses
       description: |
         Obtain information about assets associated with addresses of a specific account.
-
         <b>Be careful</b>, as an account could be part of a mangled address and does not necessarily mean the addresses are owned by user as the account.
       parameters:
         - in: path
@@ -2071,6 +2072,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/account_addresses_assets"
+        "400":
+          $ref: "#/components/responses/bad_request"
+        "403":
+          $ref: "#/components/responses/unauthorized_error"
+        "404":
+          $ref: "#/components/responses/not_found"
+        "429":
+          $ref: "#/components/responses/overusage_limit"
+        "418":
+          $ref: "#/components/responses/autobanned"
+        "500":
+          $ref: "#/components/responses/internal_server_error"
+
+  /accounts/{stake_address}/addresses/total:
+    get:
+      tags:
+        - Cardano » Addresses
+      summary: Detailed information about account associated addresses
+      description: |
+        Obtain summed details about all addresses associated with a given account.
+        <b>Be careful</b>, as an account could be part of a mangled address and does not necessarily mean the addresses are owned by user as the account.
+      parameters:
+        - in: path
+          name: address
+          required: true
+          schema:
+            type: string
+          description: Bech32 address.
+          example: "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
+      responses:
+        "200":
+          description: Return the Address details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/account_addresses_total"
         "400":
           $ref: "#/components/responses/bad_request"
         "403":
@@ -2285,6 +2322,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/address_content"
+        "400":
+          $ref: "#/components/responses/bad_request"
+        "403":
+          $ref: "#/components/responses/unauthorized_error"
+        "404":
+          $ref: "#/components/responses/not_found"
+        "429":
+          $ref: "#/components/responses/overusage_limit"
+        "418":
+          $ref: "#/components/responses/autobanned"
+        "500":
+          $ref: "#/components/responses/internal_server_error"
+
+  /addresses/{address}/extended:
+    get:
+      tags:
+        - Cardano » Addresses
+      summary: Extended information of a specific address
+      description: |
+        Obtain extended information about a specific address.
+      parameters:
+        - in: path
+          name: address
+          required: true
+          schema:
+            type: string
+          description: Bech32 address.
+          example: "addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz"
+      responses:
+        "200":
+          description: Return the address content.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/address_content_extended"
         "400":
           $ref: "#/components/responses/bad_request"
         "403":
@@ -5458,7 +5530,7 @@ components:
           active_epoch:
             type: integer
             example: 210
-            description: Epoch that the delegation becomes active
+            description: Epoch in which the update becomes active
         required:
           - cert_index
           - pool_id
@@ -5487,7 +5559,7 @@ components:
           retiring_epoch:
             type: integer
             example: 216
-            description: Retiring epoch
+            description: Epoch in which the pool becomes retired
         required:
           - cert_index
           - pool_id
@@ -5680,6 +5752,64 @@ components:
           quantity: "1"
         - unit: "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e"
           quantity: "125"
+    account_addresses_total:
+      type: object
+      properties:
+        stake_address:
+          type: string
+          description: Bech32 encoded stake address
+          example: stake1u9l5q5jwgelgagzyt6nuaasefgmn8pd25c8e9qpeprq0tdcp0e3uk
+        received_sum:
+          type: array
+          items:
+            type: object
+            description: The sum of all the UTXO per asset for all addresses associated with the account
+            properties:
+              unit:
+                type: string
+                format: Lovelace or concatenation of asset policy_id and hex-encoded asset_name
+                description: The unit of the value
+              quantity:
+                type: string
+                description: The quantity of the unit
+            required:
+              - unit
+              - quantity
+          example:
+            - unit: "lovelace"
+              quantity: "42000000"
+            - unit: "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e"
+              quantity: "12"
+        sent_sum:
+          type: array
+          items:
+            type: object
+            description: The sum of all the UTXO per asset for all addresses associated with the account
+            properties:
+              unit:
+                type: string
+                format: Lovelace or concatenation of asset policy_id and hex-encoded asset_name
+                description: The unit of the value
+              quantity:
+                type: string
+                description: The quantity of the unit
+            required:
+              - unit
+              - quantity
+          example:
+            - unit: "lovelace"
+              quantity: "42000000"
+            - unit: "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e"
+              quantity: "12"
+        tx_count:
+          type: integer
+          example: 12
+          description: Count of all transactions for all addresses associated with the account
+      required:
+        - stake_address
+        - received_sum
+        - sent_sum
+        - tx_count
     account_reward_content:
       type: array
       items:
@@ -5855,6 +5985,68 @@ components:
               quantity: "42000000"
             - unit: "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e"
               quantity: "12"
+        stake_address:
+          type: string
+          nullable: true
+          example: stake1ux3g2c9dx2nhhehyrezyxpkstartcqmu9hk63qgfkccw5rqttygt7
+          description: Stake address that controls the key
+        type:
+          type: string
+          enum: [byron, shelley]
+          example: shelley
+          description: Address era
+        script:
+          type: boolean
+          example: false
+          description: True if this is a script address
+      required:
+        - address
+        - amount
+        - stake_address
+        - type
+        - script
+
+    address_content_extended:
+      type: object
+      properties:
+        address:
+          type: string
+          description: Bech32 encoded addresses
+          example: addr1qxqs59lphg8g6qndelq8xwqn60ag3aeyfcp33c2kdp46a09re5df3pzwwmyq946axfcejy5n4x0y99wqpgtp2gd0k09qsgy6pz
+        amount:
+          type: array
+          items:
+            type: object
+            description: The sum of all the UTXO per asset
+            properties:
+              unit:
+                type: string
+                format: Lovelace or concatenation of asset policy_id and hex-encoded asset_name
+                description: The unit of the value
+              quantity:
+                type: string
+                description: The quantity of the unit
+              decimals:
+                type: integer
+                nullable: true
+                description: Number of decimal places of the asset unit
+              has_nft_onchain_metadata:
+                type: boolean
+                description: The latest minting transaction includes the NFT metadata according to CIP25
+            required:
+              - unit
+              - quantity
+              - decimals
+              - has_nft_onchain_metadata
+          example:
+            - unit: "lovelace"
+              quantity: "42000000"
+              decimals: 6
+              has_nft_onchain_metadata: false
+            - unit: "b0d07d45fe9514f80213f4020e5a61241458be626841cde717cb38a76e7574636f696e"
+              quantity: "12"
+              decimals: null
+              has_nft_onchain_metadata: true
         stake_address:
           type: string
           nullable: true
@@ -6286,6 +6478,7 @@ components:
           type: array
           items:
             type: string
+            description: Hash of the transaction including registration
           example:
             - "9f83e5484f543e05b52e99988272a31da373f3aab4c064c76db96643a355d9dc"
             - "7ce3b8c433bf401a190d58c8c483d8e3564dfd29ae8633c8b1b3e6c814403e95"
@@ -6294,6 +6487,7 @@ components:
           type: array
           items:
             type: string
+            description: Hash of the transaction including retirement
             example: "252f622976d39e646815db75a77289cf16df4ad2b287dd8e3a889ce14c13d1a8"
       required:
         - pool_id
@@ -6820,10 +7014,7 @@ components:
       required:
         - json_value
       example:
-        json_value:
-          {
-            "int": 42
-          }
+        json_value: { "int": 42 }
 
     script_json:
       type: object
@@ -6845,21 +7036,22 @@ components:
         json:
           {
             "type": "atLeast",
-            "scripts": [
-              {
-                "type": "sig",
-                "keyHash": "654891a4db2ea44b5263f4079a33efa0358ba90769e3d8f86a4a0f81"
-              },
-              {
-                "type": "sig",
-                "keyHash": "8685ad48f9bebb8fdb6447abbe140645e0bf743ff98da62e63e2147f"
-              },
-              {
-                "type": "sig",
-                "keyHash": "cb0f3b3f91693374ff7ce1d473cf6e721c7bab52b0737f04164e5a2d"
-              }
-            ],
-            "required": 2
+            "scripts":
+              [
+                {
+                  "type": "sig",
+                  "keyHash": "654891a4db2ea44b5263f4079a33efa0358ba90769e3d8f86a4a0f81",
+                },
+                {
+                  "type": "sig",
+                  "keyHash": "8685ad48f9bebb8fdb6447abbe140645e0bf743ff98da62e63e2147f",
+                },
+                {
+                  "type": "sig",
+                  "keyHash": "cb0f3b3f91693374ff7ce1d473cf6e721c7bab52b0737f04164e5a2d",
+                },
+              ],
+            "required": 2,
           }
 
     script_cbor:

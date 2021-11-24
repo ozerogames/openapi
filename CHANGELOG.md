@@ -5,13 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project will adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) once it reaches maturity in v1.
 
-## [Unreleased]
+## [] - Unreleased
 
 ### Added
 
 ### Changed
 
 ### Fixed
+
+## [0.1.33] - 2021-11-24
+
+### Added
+
+- `/addresses/{address}/extended` endpoint
+- `/accounts/{stake_address}/addresses/total` endpoint
+
+### Changed
+
+### Fixed
+
+- multiple descriptions
 
 ## [0.1.32] - 2021-10-30
 
