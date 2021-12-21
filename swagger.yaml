@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: "0.1.35"
+  version: "0.1.36"
   title: Blockfrost.io ~ API Documentation
   x-logo:
     url: https://staging.blockfrost.io/images/logo.svg
@@ -4923,6 +4923,8 @@ components:
               properties:
                 tx_hash:
                   type: string
+              required:
+                - tx_hash
         required:
           - address
           - transactions
@@ -6650,6 +6652,10 @@ components:
           type: integer
           example: 69
           description: Total minted blocks
+        blocks_epoch:
+          type: integer
+          example: 4
+          description: Number of blocks minted in the current epoch
         live_stake:
           type: string
           example: "6900000000"
@@ -6715,6 +6721,7 @@ components:
         - hex
         - vrf_key
         - blocks_minted
+        - blocks_epoch
         - live_stake
         - live_size
         - live_saturation
